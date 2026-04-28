@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análise Rentabilidade — Documentação</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #f7f6f3;
+    --surface:    #ffffff;
+    --border:     #e8e4dd;
+    --text-main:  #1a1814;
+    --text-muted: #7a7468;
+    --text-light: #b0aa9f;
+    --green:      #1e7a4a;
+    --green-bg:   #edf7f2;
+    --red:        #b93030;
+    --red-bg:     #fdf0f0;
+    --amber:      #92600a;
+    --amber-bg:   #fdf6e8;
+    --blue:       #1a4fa0;
+    --blue-bg:    #eff4fc;
+    --accent:     #2d5a3d;
+    --code-bg:    #f0ede8;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-main);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 260px;
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-header {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .sidebar-title {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  .sidebar-nav { padding: 16px 0; flex: 1; }
+
+  .nav-section {
+    padding: 8px 24px 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 24px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    font-weight: 400;
+  }
+
+  .nav-link:hover {
+    color: var(--text-main);
+    background: var(--bg);
+    border-left-color: var(--accent);
+  }
+
+  .nav-link .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .nav-link .col-label {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text-light);
+    margin-left: auto;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: 260px;
+    min-height: 100vh;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--accent);
+    padding: 72px 64px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: 30%;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 16px;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.65);
+    max-width: 520px;
+    line-height: 1.6;
+    font-weight: 300;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 32px;
+    margin-top: 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-meta-item { }
+
+  .hero-meta-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .hero-meta-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* ── INTRO CARD ── */
+  .intro-section {
+    padding: 48px 64px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .intro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-top: 32px;
+  }
+
+  .intro-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+  }
+
+  .intro-card-icon {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+
+  .intro-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 6px;
+  }
+
+  .intro-card-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ── SECTION ── */
+  .content { padding: 48px 64px 96px; }
+
+  .section-group {
+    margin-bottom: 64px;
+  }
+
+  .section-group-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-group-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    color: var(--text-light);
+    font-weight: 400;
+    flex-shrink: 0;
+  }
+
+  .section-group-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  .section-group-tag {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+
+  .tag-volume   { background: var(--blue-bg);  color: var(--blue);  }
+  .tag-cost     { background: var(--amber-bg); color: var(--amber); }
+  .tag-margin   { background: var(--green-bg); color: var(--green); }
+  .tag-result   { background: #f3f0ff;         color: #5b3fa8;      }
+  .tag-deduct   { background: var(--red-bg);   color: var(--red);   }
+
+  /* ── METRIC CARD ── */
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+
+  .metric-card:hover {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  }
+
+  .metric-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    cursor: pointer;
+  }
+
+  .metric-col-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-light);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    white-space: nowrap;
+  }
+
+  .metric-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  .metric-formula-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--code-bg);
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .metric-body {
+    padding: 0 24px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+  }
+
+  .metric-body.full { grid-template-columns: 1fr; }
+
+  .metric-what-title,
+  .metric-tip-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 8px;
+  }
+
+  .metric-what-text,
+  .metric-tip-text {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  .metric-tip-box {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 14px 16px;
+    border-left: 3px solid var(--border);
+  }
+
+  .metric-tip-box.green  { background: var(--green-bg); border-left-color: var(--green); }
+  .metric-tip-box.red    { background: var(--red-bg);   border-left-color: var(--red);   }
+  .metric-tip-box.amber  { background: var(--amber-bg); border-left-color: var(--amber); }
+  .metric-tip-box.blue   { background: var(--blue-bg);  border-left-color: var(--blue);  }
+
+  /* ── CODE BLOCK ── */
+  .code-section {
+    margin-top: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .code-section-header {
+    padding: 10px 16px;
+    background: var(--code-bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .code-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .code-block {
+    padding: 20px 24px;
+    overflow-x: auto;
+  }
+
+  .code-block pre {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--text-main);
+    white-space: pre;
+  }
+
+  .code-comment { color: var(--text-light); }
+  .code-keyword { color: #1a4fa0; font-weight: 500; }
+  .code-string  { color: #1e7a4a; }
+  .code-func    { color: #92600a; }
+  .code-measure { color: #5b3fa8; }
+
+  /* ── EXAMPLE ROW ── */
+  .example-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .example-pill {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .example-pill strong {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .example-pill span {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* ── SCALE GUIDE ── */
+  .scale-guide {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .scale-item {
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 40px 64px;
+    margin-left: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .footer-note {
+    font-size: 12px;
+    color: var(--text-light);
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 40px 0;
+  }
+
+  /* ── SECTION TITLE ── */
+  .section-title-main {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+  }
+
+  .section-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 560px;
+    line-height: 1.6;
+  }
+
+  /* ── SCROLLBAR ── */
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main, .footer { margin-left: 0; }
+    .hero, .intro-section, .content { padding: 32px 24px; }
+    .intro-grid { grid-template-columns: 1fr; }
+    .metric-body { grid-template-columns: 1fr; }
+    .hero-title { font-size: 32px; }
+    .footer { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">BI Docs</div>
+    <div class="sidebar-title">Análise Rentabilidade</div>
+  </div>
+  <nav class="sidebar-nav">
+
+    <div class="nav-section">Identificação</div>
+    <a href="#grupo" class="nav-link">
+      <span class="dot" style="background:#1a4fa0"></span>
+      Grupo
+      <span class="col-label">Col. A</span>
+    </a>
+
+    <div class="nav-section">Volume & Receita</div>
+    <a href="#fat-kg" class="nav-link">
+      <span class="dot" style="background:#1e7a4a"></span>
+      Fat. kg
+      <span class="col-label">Col. B</span>
+    </a>
+    <a href="#vlr-fat" class="nav-link">
+      <span class="dot" style="background:#1e7a4a"></span>
+      Vlr. Fat
+      <span class="col-label">Col. C</span>
+    </a>
+    <a href="#fat-un" class="nav-link">
+      <span class="dot" style="background:#1e7a4a"></span>
+      Fat. Un
+      <span class="col-label">Col. D</span>
+    </a>
+
+    <div class="nav-section">Custo Químico</div>
+    <a href="#custo-quim" class="nav-link">
+      <span class="dot" style="background:#92600a"></span>
+      C.Quím.
+      <span class="col-label">Col. E</span>
+    </a>
+    <a href="#rep-quim" class="nav-link">
+      <span class="dot" style="background:#92600a"></span>
+      Rep. Quím.
+      <span class="col-label">Col. F</span>
+    </a>
+    <a href="#rep-fix" class="nav-link">
+      <span class="dot" style="background:#92600a"></span>
+      Rep. Fix.
+      <span class="col-label">Col. G</span>
+    </a>
+
+    <div class="nav-section">Margem de Contribuição</div>
+    <a href="#mc" class="nav-link">
+      <span class="dot" style="background:#2d5a3d"></span>
+      M.C.
+      <span class="col-label">Col. H</span>
+    </a>
+    <a href="#mc-pct" class="nav-link">
+      <span class="dot" style="background:#2d5a3d"></span>
+      M.C. %
+      <span class="col-label">Col. I</span>
+    </a>
+
+    <div class="nav-section">Custo Fixo</div>
+    <a href="#custo-fixo" class="nav-link">
+      <span class="dot" style="background:#b93030"></span>
+      C.Fixo
+      <span class="col-label">Col. J</span>
+    </a>
+
+    <div class="nav-section">Deduções</div>
+    <a href="#fin" class="nav-link">
+      <span class="dot" style="background:#5b3fa8"></span>
+      C.Fin.%
+      <span class="col-label">Col. K</span>
+    </a>
+    <a href="#imp" class="nav-link">
+      <span class="dot" style="background:#5b3fa8"></span>
+      Imp.%
+      <span class="col-label">Col. L</span>
+    </a>
+    <a href="#icms" class="nav-link">
+      <span class="dot" style="background:#5b3fa8"></span>
+      ICMS%
+      <span class="col-label">Col. M</span>
+    </a>
+    <a href="#frete" class="nav-link">
+      <span class="dot" style="background:#5b3fa8"></span>
+      Fre.Un.
+      <span class="col-label">Col. N</span>
+    </a>
+    <a href="#comiss" class="nav-link">
+      <span class="dot" style="background:#5b3fa8"></span>
+      Comiss.%
+      <span class="col-label">Col. O</span>
+    </a>
+
+    <div class="nav-section">Resultado Final</div>
+    <a href="#resultado" class="nav-link">
+      <span class="dot" style="background:#1a1814"></span>
+      Resultado
+      <span class="col-label">Col. P</span>
+    </a>
+    <a href="#rentab" class="nav-link">
+      <span class="dot" style="background:#1a1814"></span>
+      Rent. (%)
+      <span class="col-label">Col. Q</span>
+    </a>
+
+  </nav>
+</aside>
+
+<!-- ══════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════ -->
+<main class="main">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-eyebrow">Power BI · Documentação Técnica</div>
+    <h1 class="hero-title">Análise<br>Rentabilidade</h1>
+    <p class="hero-sub">
+      Guia completo de todos os indicadores da tela de rentabilidade — o que cada número significa, como é calculado e o que fazer com essa informação.
+    </p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <div class="hero-meta-value">17</div>
+        <div class="hero-meta-label">Indicadores</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="hero-meta-value">5</div>
+        <div class="hero-meta-label">Grupos de análise</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="hero-meta-value">DAX</div>
+        <div class="hero-meta-label">Linguagem</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- INTRO -->
+  <section class="intro-section">
+    <h2 class="section-title-main">Como ler essa tela</h2>
+    <p class="section-desc">
+      Cada linha representa um grupo de clientes ou cliente. As colunas mostram o fluxo completo: do quanto faturamos até quanto de lucro sobrou — passando por todos os custos e deduções.
+    </p>
+    <div class="intro-grid">
+      <div class="intro-card">
+        <div class="intro-card-icon">📊</div>
+        <div class="intro-card-title">Leia da esquerda para a direita</div>
+        <div class="intro-card-text">A tabela mostra o caminho do dinheiro: começa pelo faturamento bruto e vai subtraindo cada custo até chegar no resultado final.</div>
+      </div>
+      <div class="intro-card">
+        <div class="intro-card-icon">🟢</div>
+        <div class="intro-card-title">Verde é bom, vermelho é alerta</div>
+        <div class="intro-card-text">Células verdes indicam rentabilidade positiva. Vermelho significa que aquele cliente ou grupo está gerando prejuízo ou está abaixo do esperado.</div>
+      </div>
+      <div class="intro-card">
+        <div class="intro-card-icon">⚖️</div>
+        <div class="intro-card-title">Por kg = compare sem viés de volume</div>
+        <div class="intro-card-text">Usar valores por quilo (Un.) permite comparar clientes grandes e pequenos de forma justa, sem que o volume distorça a análise.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CONTENT ─── -->
+  <div class="content">
+
+    <!-- ════════════════════════════════
+         GRUPO 1 — IDENTIFICAÇÃO
+    ════════════════════════════════ -->
+    <div id="grupo" class="section-group">
+      <div class="section-group-header">
+        <span class="section-group-number">01</span>
+        <h2 class="section-group-title">Identificação do Cliente</h2>
+        <span class="section-group-tag tag-volume">Cadastro</span>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna A</span>
+          <span class="metric-name">Grupo</span>
+          <span class="metric-formula-pill">NOMGRE → NOMCLI</span>
+        </div>
+        <div class="metric-body">
+          <div>
+            <div class="metric-what-title">O que é</div>
+            <div class="metric-what-text">
+              Nome que identifica o cliente ou grupo de empresas na linha da tabela. Quando um cliente pertence a um grupo econômico (várias CNPJs com o mesmo dono), a tela agrupa tudo em uma única linha com o nome do grupo. Se o cliente não tiver grupo cadastrado, usa o nome do cliente direto.
+            </div>
+            <div class="example-row">
+              <div class="example-pill">
+                <strong>Grupo X</strong>
+                <span>3 CNPJs agrupados</span>
+              </div>
+              <div class="example-pill">
+                <strong>Cliente Y</strong>
+                <span>Sem grupo → nome direto</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="metric-tip-title">Por que importa</div>
+            <div class="metric-tip-box blue">
+              <div class="metric-tip-text">
+                Garante que toda a receita e custos de um mesmo dono sejam analisados juntos. Evita que empresas do mesmo grupo apareçam espalhadas e gerem uma visão distorcida da rentabilidade real daquele cliente.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header">
+            <span class="code-section-title">DAX — Grupo</span>
+          </div>
+          <div class="code-block"><pre><span class="code-comment">-- Se o campo "Nome do Grupo" estiver vazio, usa o Nome do Cliente.
+-- Se o cliente tem grupo cadastrado, usa o Nome do Grupo.</span>
+Grupo = 
+    <span class="code-keyword">IF</span>(
+        'CLIENTES E085CLI'[NOMGRE] = <span class="code-keyword">BLANK</span>(),   <span class="code-comment">-- Campo grupo está vazio?</span>
+        'CLIENTES E085CLI'[NOMCLI],               <span class="code-comment">-- Sim → usa nome do cliente</span>
+        'CLIENTES E085CLI'[NOMGRE]                <span class="code-comment">-- Não → usa nome do grupo</span>
+    )</pre></div>
+        </div>
+      </div>
+    </div><!-- /grupo -->
+
+
+    <!-- ════════════════════════════════
+         GRUPO 2 — VOLUME & RECEITA
+    ════════════════════════════════ -->
+    <div class="section-group">
+      <div class="section-group-header">
+        <span class="section-group-number">02</span>
+        <h2 class="section-group-title">Volume & Receita</h2>
+        <span class="section-group-tag tag-volume">Faturamento</span>
+      </div>
+
+      <!-- Fat. kg -->
+      <div id="fat-kg" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna B</span>
+          <span class="metric-name">Fat. kg — Quilos Faturados</span>
+          <span class="metric-formula-pill">Tecelagem + Tinto</span>
+        </div>
+        <div class="metric-body">
+          <div>
+            <div class="metric-what-title">O que é</div>
+            <div class="metric-what-text">
+              Total de quilos que saíram da fábrica e foram faturados para o cliente. É a soma de dois processos: <strong>Tecelagem</strong> (tecido cru, antes do tingimento) e <strong>Tinturaria</strong> (tecido tingido/beneficiado). É a base de peso de toda a análise.
+            </div>
+          </div>
+          <div>
+            <div class="metric-tip-title">Para o time de produção</div>
+            <div class="metric-tip-box blue">
+              <div class="metric-tip-text">
+                Volume alto não significa lucro alto. Um cliente com 2 milhões de kg pode ser menos rentável do que um com 500 mil kg, dependendo dos custos envolvidos. Use esse número para entender o tamanho do cliente, não a sua qualidade.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — Fat. kg</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- Soma a produção de dois processos físicos da fábrica.</span>
+Fat. kg = 
+    [Qtd.Tecelagem]   <span class="code-comment">-- Quilos do processo de Tecelagem</span>
+    + [Qtd.Tinto]     <span class="code-comment">-- Quilos do processo de Tinturaria (tingimento)</span></pre></div>
+        </div>
+      </div>
+
+      <!-- Vlr. Fat -->
+      <div id="vlr-fat" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna C</span>
+          <span class="metric-name">Vlr. Fat — Faturamento Total</span>
+          <span class="metric-formula-pill">Produto + Serviço + Insumos</span>
+        </div>
+        <div class="metric-body">
+          <div>
+            <div class="metric-what-title">O que é</div>
+            <div class="metric-what-text">
+              Receita bruta total gerada pelo cliente. Inclui três fontes: valor dos <strong>produtos</strong> vendidos nas notas fiscais, valor dos <strong>serviços</strong> prestados (ex: beneficiamento), e valor de <strong>insumos</strong>. Produtos internos (uso próprio da fábrica) são excluídos.
+            </div>
+          </div>
+          <div>
+            <div class="metric-tip-title">Atenção</div>
+            <div class="metric-tip-box amber">
+              <div class="metric-tip-text">
+                Este valor é a <strong>receita bruta</strong> — antes de qualquer desconto de custo. Olhar só o faturamento é enganoso: um cliente que fatura muito pode ter custos proporcionalmente altos e gerar pouco resultado no final.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — Vlr. Fat Rent</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- Soma as três fontes de receita do cliente,
+-- excluindo produtos que não devem entrar na análise.</span>
+Vlr. Fat Rent = 
+    <span class="code-keyword">CALCULATE</span>(
+        <span class="code-keyword">SUM</span>('NOTA_ITENS E140IPV'[VLRBRU])       <span class="code-comment">-- Valor bruto dos produtos nas NFs</span>
+        + <span class="code-keyword">SUM</span>('NOTA_ITENS E140IPV'[VlrServ])    <span class="code-comment">-- Valor de serviços prestados</span>
+        + [Insumos],                             <span class="code-comment">-- Receita de insumos</span>
+
+        <span class="code-comment">-- Filtros: exclui itens que não pertencem à análise</span>
+        'NOTA_ITENS E140IPV'[CODPRO] <> <span class="code-string">"18402"</span>   <span class="code-comment">-- Produto de uso interno</span>
+        && 'NOTA_ITENS E140IPV'[CODPRO] <> <span class="code-string">"999"</span>  <span class="code-comment">-- Ajustes/cancelamentos</span>
+        && 'NOTA_ITENS E140IPV'[CODPRO] <> <span class="code-string">"MAL IND"</span> <span class="code-comment">-- Malha industrial</span>
+    )</pre></div>
+        </div>
+      </div>
+
+      <!-- Fat Un -->
+      <div id="fat-un" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna D</span>
+          <span class="metric-name">Un — Preço Médio por Kg</span>
+          <span class="metric-formula-pill">Vlr. Fat ÷ Fat. kg</span>
+        </div>
+        <div class="metric-body">
+          <div>
+            <div class="metric-what-title">O que é</div>
+            <div class="metric-what-text">
+              Preço médio recebido por quilo faturado ao cliente. Divide o faturamento total pelo total de quilos. Clientes com mix de produtos mais nobres ou com maior valor agregado tendem a ter um preço/kg mais alto.
+            </div>
+            <div class="example-row">
+              <div class="example-pill">
+                <strong>R$ 7,24</strong>
+                <span>Média geral (Total)</span>
+              </div>
+              <div class="example-pill">
+                <strong>R$ 9,75</strong>
+                <span>Cliente com produto nobre</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="metric-tip-title">Interpretação</div>
+            <div class="metric-tip-box green">
+              <div class="metric-tip-text">
+                Preço/kg alto pode indicar produto de maior valor agregado ou melhor posicionamento comercial. Mas atenção: preço alto com custo alto pode ter margem menor do que um produto mais simples e barato de produzir.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — Fat Un Rent</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- Preço médio por quilo = Receita total ÷ Quilos totais</span>
+Fat Un Rent = 
+    [Vlr. Fat Rent]   <span class="code-comment">-- Faturamento total</span>
+    / [Fat. kg]       <span class="code-comment">-- Dividido pelos quilos faturados</span></pre></div>
+        </div>
+      </div>
+    </div><!-- /volume & receita -->
+
+
+    <!-- ════════════════════════════════
+         GRUPO 3 — CUSTO QUÍMICO
+    ════════════════════════════════ -->
+    <div class="section-group">
+      <div class="section-group-header">
+        <span class="section-group-number">03</span>
+        <h2 class="section-group-title">Custos Químicos & Reprocesso</h2>
+        <span class="section-group-tag tag-cost">Custo Direto</span>
+      </div>
+
+      <!-- Custo Quim -->
+      <div id="custo-quim" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna E</span>
+          <span class="metric-name">C.Quím. — Custo Químico Total</span>
+          <span class="metric-formula-pill">Σ USU_VLRCUSDIR</span>
+        </div>
+        <div class="metric-body">
+          <div>
+            <div class="metric-what-title">O que é</div>
+            <div class="metric-what-text">
+              Soma de todos os produtos químicos consumidos na produção daquele cliente: <strong>corantes</strong>, <strong>auxiliares de processo</strong>, <strong>fixadores</strong>, produtos de preparação, etc. É o principal custo variável direto da tinturaria.
+            </div>
+          </div>
+          <div>
+            <div class="metric-tip-title">O que ele revela</div>
+            <div class="metric-tip-box amber">
+              <div class="metric-tip-text">
+                Clientes com cores especiais, poliéster ou processos complexos tendem a ter custo químico mais alto. Comparar o <strong>%</strong> ao lado (C.Quím.%) entre clientes é mais útil do que olhar o valor absoluto.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — Custo Químico</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- Soma o custo direto com químicos de cada item da nota fiscal,
+-- excluindo devoluções (N2) e produto interno.</span>
+Custo Químico = 
+    <span class="code-keyword">CALCULATE</span>(
+        <span class="code-keyword">SUM</span>('NOTA_ITENS E140IPV'[USU_VLRCUSDIR]),  <span class="code-comment">-- Custo químico direto por item</span>
+        'NOTA_ITENS E140IPV'[CODSNF] <> <span class="code-string">"N2"</span>,      <span class="code-comment">-- Exclui notas de devolução</span>
+        'NOTA_ITENS E140IPV'[CODPRO] <> <span class="code-string">"18402"</span>    <span class="code-comment">-- Exclui produto interno</span>
+    )
+
+<span class="code-comment">-- Por kg: quanto foi gasto em químicos por quilo produzido</span>
+Custo Químico Un = [Custo Químico] / [Fat. kg]
+
+<span class="code-comment">-- Percentual: qual fatia do faturamento foi consumida por químicos</span>
+Custo Químico % = [Custo Químico] / [Vlr. Fat Rent]</pre></div>
+        </div>
+      </div>
+
+      <!-- Rep. Quim -->
+      <div id="rep-quim" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna F</span>
+          <span class="metric-name">Rep. Quím. — Reprocesso Químico</span>
+          <span class="metric-formula-pill">Σ VLRREPROCESSO_QUIM</span>
+        </div>
+        <div class="metric-body">
+          <div>
+            <div class="metric-what-title">O que é</div>
+            <div class="metric-what-text">
+              Custo com produtos químicos usados quando um lote precisa ser <strong>reprocessado</strong> — ou seja, refeito por falha no tingimento (cor errada, mancha, irregularidade). É um custo de não-qualidade: ideal que seja zero.
+            </div>
+          </div>
+          <div>
+            <div class="metric-tip-title">Alerta de qualidade</div>
+            <div class="metric-tip-box red">
+              <div class="metric-tip-text">
+                Valor alto de reprocesso indica problemas no processo produtivo: receita química incorreta, falha de maquinário, matéria-prima fora do padrão. Esse custo entra diretamente contra a margem do cliente.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — Custo Reprocesso Quím</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- Calcula o custo químico dos reprocessos.
+-- Só entra quando não está em modo de recálculo (situação normal).
+-- Se estiver em recálculo, zera para evitar duplicidade de valores.</span>
+Custo Reprocesso Quim = 
+    <span class="code-keyword">VAR</span> CUSTO = 
+        <span class="code-keyword">CALCULATE</span>(
+            <span class="code-keyword">SUM</span>('NOTA_ITENS E140IPV'[USU_VLRREPROCESSO_QUIM]),  <span class="code-comment">-- Custo quím. do reprocesso</span>
+            'NOTA_ITENS E140IPV'[CODSNF] <> <span class="code-string">"N2"</span>,               <span class="code-comment">-- Exclui devoluções</span>
+            'NOTA_ITENS E140IPV'[CODPRO] <> <span class="code-string">"18402"</span>             <span class="code-comment">-- Exclui produto interno</span>
+        )
+    <span class="code-keyword">RETURN</span>
+        <span class="code-keyword">IF</span>(
+            [Recalculo Valor] = <span class="code-string">"0"</span>,   <span class="code-comment">-- Situação normal (sem recálculo)?</span>
+            CUSTO,                     <span class="code-comment">-- Sim → retorna o custo real</span>
+            <span class="code-keyword">IF</span>(CUSTO = 0, CUSTO, 0)    <span class="code-comment">-- Em recálculo → zera para não duplicar</span>
+        )</pre></div>
+        </div>
+      </div>
+
+      <!-- Rep. Fix -->
+      <div id="rep-fix" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna G</span>
+          <span class="metric-name">Rep. Fix. — Reprocesso Fixo</span>
+          <span class="metric-formula-pill">Σ VLRREPROCESSO_FIX</span>
+        </div>
+        <div class="metric-body">
+          <div>
+            <div class="metric-what-title">O que é</div>
+            <div class="metric-what-text">
+              Custo fixo gerado pelo reprocesso: <strong>mão de obra</strong> e <strong>tempo de máquina</strong> para refazer o lote. Enquanto o Rep. Quím. é o custo dos produtos usados novamente, o Rep. Fix. é o custo de ocupar a fábrica fazendo de novo o que já foi feito.
+            </div>
+          </div>
+          <div>
+            <div class="metric-tip-title">Impacto operacional</div>
+            <div class="metric-tip-box red">
+              <div class="metric-tip-text">
+                Além do custo financeiro, o reprocesso ocupa capacidade produtiva que poderia estar gerando novos pedidos. É duplo prejuízo: o que foi gasto de novo + o que deixou de ser produzido.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — Custo Reprocesso Fix</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- Mesma lógica do Reprocesso Químico, mas captura o custo
+-- de mão de obra e máquina para refazer o lote (custo fixo).
+-- Também é zerado em modo de recálculo para evitar duplicidade.</span>
+Custo Reprocesso Fix = 
+    <span class="code-keyword">VAR</span> CUSTO = 
+        <span class="code-keyword">CALCULATE</span>(
+            <span class="code-keyword">SUM</span>('NOTA_ITENS E140IPV'[USU_VLRREPROCESSO_FIX]),  <span class="code-comment">-- MO + máquina do reprocesso</span>
+            'NOTA_ITENS E140IPV'[CODSNF] <> <span class="code-string">"N2"</span>,              <span class="code-comment">-- Exclui devoluções</span>
+            'NOTA_ITENS E140IPV'[CODPRO] <> <span class="code-string">"18402"</span>            <span class="code-comment">-- Exclui produto interno</span>
+        )
+    <span class="code-keyword">RETURN</span>
+        <span class="code-keyword">IF</span>(
+            [Recalculo Valor] = <span class="code-string">"0"</span>,   <span class="code-comment">-- Modo normal?</span>
+            CUSTO,                     <span class="code-comment">-- Sim → retorna custo real</span>
+            <span class="code-keyword">IF</span>(CUSTO = 0, CUSTO, 0)    <span class="code-comment">-- Em recálculo → zera</span>
+        )</pre></div>
+        </div>
+      </div>
+    </div><!-- /custo quimico -->
+
+
+    <!-- ════════════════════════════════
+         GRUPO 4 — MARGEM CONTRIBUIÇÃO
+    ════════════════════════════════ -->
+    <div class="section-group">
+      <div class="section-group-header">
+        <span class="section-group-number">04</span>
+        <h2 class="section-group-title">Margem de Contribuição</h2>
+        <span class="section-group-tag tag-margin">Indicador Chave</span>
+      </div>
+
+      <div id="mc" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna H · I</span>
+          <span class="metric-name">M.C. — Margem de Contribuição</span>
+          <span class="metric-formula-pill">Fat − Custos Variáveis</span>
+        </div>
+        <div class="metric-body full">
+          <div>
+            <div class="metric-what-title">O que é — O indicador mais estratégico da tabela</div>
+            <div class="metric-what-text">
+              É quanto sobra do faturamento depois de pagar todos os custos <strong>variáveis</strong>: frete, comissão, impostos, custo financeiro, químicos e reprocesso químico. A Margem de Contribuição é o dinheiro disponível para <strong>cobrir os custos fixos</strong> da empresa (aluguel, energia, mão de obra fixa) e, só depois, gerar lucro.<br><br>
+              <strong>Em linguagem simples:</strong> "De cada R$100 que esse cliente nos paga, R$X sobram para manter a fábrica funcionando e gerar resultado."
+            </div>
+          </div>
+        </div>
+        <div style="padding: 0 24px 16px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+          <div class="metric-tip-box red">
+            <div class="metric-tip-title" style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#b93030;margin-bottom:6px;">⚠ Abaixo de 40%</div>
+            <div class="metric-tip-text">Custo variável muito alto. Rever precificação, mix de produto ou eficiência química.</div>
+          </div>
+          <div class="metric-tip-box amber">
+            <div class="metric-tip-title" style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#92600a;margin-bottom:6px;">⚡ Entre 40% e 55%</div>
+            <div class="metric-tip-text">Zona de atenção. Pode ser aceitável dependendo do custo fixo da operação.</div>
+          </div>
+          <div class="metric-tip-box green">
+            <div class="metric-tip-title" style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#1e7a4a;margin-bottom:6px;">✓ Acima de 55%</div>
+            <div class="metric-tip-text">Boa margem variável. Produto bem posicionado e processo eficiente.</div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — Margem de Contribuição</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- Faturamento menos todos os custos variáveis.
+-- Resultado: quanto sobra para cobrir custos fixos e gerar lucro.</span>
+Margem de Contribuição = 
+    <span class="code-keyword">CALCULATE</span>(
+        [Vlr. Fat Rent]       <span class="code-comment">-- Começa pelo faturamento bruto</span>
+        - [Vlr. Frete]        <span class="code-comment">-- (-) Custo de transporte e entrega</span>
+        - [Vlr. Comiss.]      <span class="code-comment">-- (-) Comissão paga ao vendedor</span>
+        - [Custo Impostos]    <span class="code-comment">-- (-) PIS + COFINS + INSS</span>
+        - [Custo Fin.]        <span class="code-comment">-- (-) Juros e taxas financeiras</span>
+        - [Custo Químico],    <span class="code-comment">-- (-) Químicos da produção</span>
+        'NOTA_ITENS E140IPV'[CODPRO] <> <span class="code-string">"18402"</span>
+    )
+    - [Custo Reprocesso Quim]  <span class="code-comment">-- (-) Químico gasto em reprocessos</span>
+
+<span class="code-comment">-- Por kg: margem gerada por cada quilo produzido</span>
+Margem de Contribuição Un. = <span class="code-keyword">DIVIDE</span>([Margem de Contribuição], [Fat. kg])
+
+<span class="code-comment">-- Percentual: fatia do faturamento que vira margem variável</span>
+Margem de Contribuição % = [Margem de Contribuição] / [Vlr. Fat Rent]</pre></div>
+        </div>
+      </div>
+    </div><!-- /mc -->
+
+
+    <!-- ════════════════════════════════
+         GRUPO 5 — CUSTO FIXO
+    ════════════════════════════════ -->
+    <div class="section-group">
+      <div class="section-group-header">
+        <span class="section-group-number">05</span>
+        <h2 class="section-group-title">Custo Fixo</h2>
+        <span class="section-group-tag tag-cost">Rateio</span>
+      </div>
+
+      <div id="custo-fixo" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna J · K · L</span>
+          <span class="metric-name">C.Fixo — Custo Fixo Rateado</span>
+          <span class="metric-formula-pill">Σ Custo Fixo por Item</span>
+        </div>
+        <div class="metric-body">
+          <div>
+            <div class="metric-what-title">O que é</div>
+            <div class="metric-what-text">
+              Parcela dos custos fixos da fábrica alocada para cada cliente, proporcionalmente ao seu volume. Custos fixos são aqueles que existem independente da produção: <strong>aluguel</strong>, <strong>energia elétrica</strong>, <strong>salários de pessoal fixo</strong>, <strong>depreciação de máquinas</strong>, seguros, etc.<br><br>
+              Clientes com maior volume "absorvem" mais custo fixo em valor absoluto, mas diluem melhor o custo por kg.
+            </div>
+          </div>
+          <div>
+            <div class="metric-tip-title">Conceito importante</div>
+            <div class="metric-tip-box blue">
+              <div class="metric-tip-text">
+                <strong>Diluição do fixo:</strong> quanto mais a fábrica produz, menor é o custo fixo por quilo. Por isso, aumentar o volume de produção (com qualidade) é estratégico — o mesmo aluguel e a mesma folha são divididos por mais quilos, melhorando a rentabilidade de todos os clientes.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — Custo Fixo</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- Soma o rateio de custo fixo alocado a cada item do cliente.</span>
+Custo Fixo = 
+    <span class="code-keyword">CALCULATE</span>(
+        <span class="code-keyword">SUM</span>('NOTA_ITENS E140IPV'[Custo Fixo]),    <span class="code-comment">-- Custo fixo rateado por item de NF</span>
+        'NOTA_ITENS E140IPV'[CODPRO] <> <span class="code-string">"18402"</span>  <span class="code-comment">-- Exclui produto interno</span>
+    )
+
+<span class="code-comment">-- Por kg: custo fixo absorvido por quilo produzido</span>
+Custo Fixo Un. = [Custo Fixo] / [Fat. kg]
+
+<span class="code-comment">-- Percentual: fatia do faturamento comprometida com custos fixos</span>
+Custo Fixo % = [Custo Fixo] / [Vlr. Fat Rent]</pre></div>
+        </div>
+      </div>
+    </div><!-- /custo fixo -->
+
+
+    <!-- ════════════════════════════════
+         GRUPO 6 — DEDUÇÕES
+    ════════════════════════════════ -->
+    <div class="section-group">
+      <div class="section-group-header">
+        <span class="section-group-number">06</span>
+        <h2 class="section-group-title">Deduções sobre o Faturamento</h2>
+        <span class="section-group-tag tag-deduct">Encargos</span>
+      </div>
+
+      <!-- Financeiro -->
+      <div id="fin" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna M</span>
+          <span class="metric-name">C.Fin.% — Custo Financeiro</span>
+          <span class="metric-formula-pill">Custo Fin. ÷ Fat.</span>
+        </div>
+        <div class="metric-body">
+          <div>
+            <div class="metric-what-title">O que é</div>
+            <div class="metric-what-text">
+              Percentual do faturamento comprometido com custos financeiros: <strong>juros de antecipação de recebíveis</strong>, taxas bancárias, custo do prazo concedido ao cliente. Clientes com prazo de pagamento maior geram custo financeiro maior.
+            </div>
+          </div>
+          <div>
+            <div class="metric-tip-title">Relação com prazo</div>
+            <div class="metric-tip-box amber">
+              <div class="metric-tip-text">
+                Um cliente que paga em 60 dias tem custo financeiro maior do que um que paga em 28 dias. Esse custo é real e impacta o resultado final — negociar prazo é negociar rentabilidade.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — Financeiro %</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- Percentual do faturamento consumido por juros e taxas financeiras.</span>
+Financeiro % = 
+    [Custo Fin.]        <span class="code-comment">-- Custo financeiro total (juros, taxas, antecipação)</span>
+    / [Vlr. Fat Rent]   <span class="code-comment">-- Sobre o faturamento bruto</span></pre></div>
+        </div>
+      </div>
+
+      <!-- Impostos -->
+      <div id="imp" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna N</span>
+          <span class="metric-name">Imp.% — Impostos Federais</span>
+          <span class="metric-formula-pill">PIS + COFINS + INSS</span>
+        </div>
+        <div class="metric-body">
+          <div>
+            <div class="metric-what-title">O que é</div>
+            <div class="metric-what-text">
+              Soma dos três tributos federais incidentes sobre a receita:
+              <br>• <strong>PIS</strong> — Programa de Integração Social (~0,65%)
+              <br>• <strong>COFINS</strong> — Contribuição Social (~3%)
+              <br>• <strong>INSS</strong> — Contribuição Previdenciária Patronal
+              <br><br>São custos obrigatórios, praticamente fixos em percentual para todos os clientes dentro do mesmo regime tributário.
+            </div>
+          </div>
+          <div>
+            <div class="metric-tip-title">Natureza do custo</div>
+            <div class="metric-tip-box blue">
+              <div class="metric-tip-text">
+                Esse custo é previsível e pouco varia entre clientes. Serve como referência de custo mínimo tributário. Se esse percentual mudar muito entre clientes, pode indicar diferença de regime tributário ou isenções específicas.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — Impostos %</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- Soma os três impostos federais sobre a receita.</span>
+Impostos % = 
+    [PIS %]       <span class="code-comment">-- Contribuição PIS (~0,65% da receita)</span>
+    + [Cofins %]  <span class="code-comment">-- Contribuição COFINS (~3% da receita)</span>
+    + [INSS %]    <span class="code-comment">-- INSS patronal sobre a receita</span></pre></div>
+        </div>
+      </div>
+
+      <!-- ICMS -->
+      <div id="icms" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna O</span>
+          <span class="metric-name">ICMS % — Imposto Estadual</span>
+          <span class="metric-formula-pill">Vlr. ICMS ÷ Fat.</span>
+        </div>
+        <div class="metric-body">
+          <div>
+            <div class="metric-what-title">O que é</div>
+            <div class="metric-what-text">
+              Percentual do ICMS (Imposto sobre Circulação de Mercadorias e Serviços) sobre o faturamento. Varia conforme o <strong>estado de destino</strong> da mercadoria: operações interestaduais têm alíquotas diferentes (7% ou 12%) das operações dentro do mesmo estado (tipicamente 17% ou 18%).
+            </div>
+          </div>
+          <div>
+            <div class="metric-tip-title">Varia por cliente</div>
+            <div class="metric-tip-box amber">
+              <div class="metric-tip-text">
+                Clientes de outros estados podem ter ICMS menor (por alíquota interestadual), mas exigem mais logística. Essa diferença de alíquota é relevante na precificação e na comparação de rentabilidade entre clientes de regiões diferentes.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — ICMS %</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- DIVIDE é usado para evitar erro quando não há faturamento.
+-- Retorna BLANK() (célula vazia) ao invés de "Divisão por zero".</span>
+ICMS % = 
+    <span class="code-keyword">DIVIDE</span>(
+        [Vlr. ICMS],        <span class="code-comment">-- Valor total de ICMS das notas fiscais</span>
+        [Vlr. Fat Rent],    <span class="code-comment">-- Sobre o faturamento total</span>
+        <span class="code-keyword">BLANK</span>()             <span class="code-comment">-- Se dividir por zero → célula vazia (sem erro)</span>
+    )</pre></div>
+        </div>
+      </div>
+
+      <!-- Frete -->
+      <div id="frete" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna P</span>
+          <span class="metric-name">Fre.Un. — Frete por Kg</span>
+          <span class="metric-formula-pill">Vlr. Frete ÷ Fat. kg</span>
+        </div>
+        <div class="metric-body">
+          <div>
+            <div class="metric-what-title">O que é</div>
+            <div class="metric-what-text">
+              Custo médio de frete para entregar cada quilo ao cliente. Clientes distantes ou que exigem entregas fracionadas (muitos pedidos pequenos) tendem a ter frete/kg mais alto. É um custo variável que depende da localização e da política de entrega.
+            </div>
+            <div class="example-row">
+              <div class="example-pill">
+                <strong>R$ 0,21/kg</strong>
+                <span>Cliente local, volume alto</span>
+              </div>
+              <div class="example-pill">
+                <strong>R$ 0,75/kg</strong>
+                <span>Cliente distante ou fracionado</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="metric-tip-title">Oportunidade</div>
+            <div class="metric-tip-box green">
+              <div class="metric-tip-text">
+                Aumentar o volume de entrega por viagem (consolidar pedidos) é uma das formas mais diretas de reduzir o frete/kg. Também vale revisar a política de frete grátis: o custo existe e precisa estar embutido no preço.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — Frete Un.</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- Custo médio de frete por quilo entregue ao cliente.</span>
+Frete Un. = 
+    [Vlr. Frete]   <span class="code-comment">-- Custo total de frete do período</span>
+    / [Fat. kg]    <span class="code-comment">-- Dividido pelos quilos entregues</span></pre></div>
+        </div>
+      </div>
+
+      <!-- Comissão -->
+      <div id="comiss" class="metric-card">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna Q</span>
+          <span class="metric-name">Comiss.% — Comissão sobre Vendas</span>
+          <span class="metric-formula-pill">Vlr. Comiss. ÷ Fat.</span>
+        </div>
+        <div class="metric-body">
+          <div>
+            <div class="metric-what-title">O que é</div>
+            <div class="metric-what-text">
+              Percentual do faturamento destinado à comissão do vendedor ou representante responsável pelo cliente. Varia conforme o canal de venda: clientes atendidos por representantes externos têm comissão mais alta do que clientes atendidos por vendedores internos ou sem comissão.
+            </div>
+          </div>
+          <div>
+            <div class="metric-tip-title">Impacto comercial</div>
+            <div class="metric-tip-box blue">
+              <div class="metric-tip-text">
+                Um cliente com 3% de comissão tem rentabilidade 3 pontos percentuais menor do que um cliente sem comissão — a receita é a mesma, mas o custo é diferente. Isso deve ser considerado na hora de definir preços e metas por canal.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — Comissão %</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- Percentual do faturamento pago em comissão de vendas.</span>
+Comissão % = 
+    [Vlr. Comiss.]      <span class="code-comment">-- Total de comissões pagas no período</span>
+    / [Vlr. Fat Rent]   <span class="code-comment">-- Sobre o faturamento bruto</span></pre></div>
+        </div>
+      </div>
+    </div><!-- /deduções -->
+
+
+    <!-- ════════════════════════════════
+         GRUPO 7 — RESULTADO FINAL
+    ════════════════════════════════ -->
+    <div class="section-group">
+      <div class="section-group-header">
+        <span class="section-group-number">07</span>
+        <h2 class="section-group-title">Resultado Final</h2>
+        <span class="section-group-tag tag-result">Conclusão</span>
+      </div>
+
+      <!-- Resultado -->
+      <div id="resultado" class="metric-card" style="border-color:#d0cac0;">
+        <div class="metric-header">
+          <span class="metric-col-badge">Coluna R · S</span>
+          <span class="metric-name">Resultado — Lucro ou Prejuízo</span>
+          <span class="metric-formula-pill">Fat − Todos os Custos</span>
+        </div>
+        <div class="metric-body full">
+          <div>
+            <div class="metric-what-title">O que é — O número mais importante após a Rentabilidade</div>
+            <div class="metric-what-text">
+              É o resultado financeiro real gerado pelo cliente: o <strong>lucro</strong> (verde) ou o <strong>prejuízo</strong> (vermelho) depois de descontar absolutamente todos os custos — variáveis e fixos. Inclui: custo financeiro, impostos, comissão, frete, custo fixo rateado, custo químico, e todos os reprocessos.<br><br>
+              <strong>Resultado positivo</strong> = o cliente está gerando valor para a empresa.<br>
+              <strong>Resultado negativo</strong> = a empresa está pagando para atender esse cliente.
+            </div>
+          </div>
+          <div style="margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="metric-tip-box green">
+              <div class="metric-tip-title" style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#1e7a4a;margin-bottom:6px;">✓ Positivo (Verde)</div>
+              <div class="metric-tip-text">O cliente paga mais do que custa. Manter, crescer e priorizar operacionalmente.</div>
+            </div>
+            <div class="metric-tip-box red">
+              <div class="metric-tip-title" style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#b93030;margin-bottom:6px;">✗ Negativo (Vermelho)</div>
+              <div class="metric-tip-text">O cliente custa mais do que paga. Investigar causa: preço, custo químico, reprocesso ou custo fixo alto.</div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — Resultado</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- Resultado final = Faturamento menos TODOS os custos.
+-- É o lucro ou prejuízo real do cliente no período.</span>
+Resultado = 
+    <span class="code-keyword">CALCULATE</span>(
+        [Vlr. Fat Rent]       <span class="code-comment">-- (+) Faturamento bruto do cliente</span>
+        - [Custo Fin.]        <span class="code-comment">-- (-) Juros e taxas financeiras</span>
+        - [Custo Impostos]    <span class="code-comment">-- (-) PIS + COFINS + INSS</span>
+        - [Vlr. Comiss.]      <span class="code-comment">-- (-) Comissão dos vendedores</span>
+        - [Vlr. Frete]        <span class="code-comment">-- (-) Custo de frete e logística</span>
+        - [Custo Fixo]        <span class="code-comment">-- (-) Rateio dos custos fixos da fábrica</span>
+        - [Custo Químico],    <span class="code-comment">-- (-) Produtos químicos da produção</span>
+        'NOTA_ITENS E140IPV'[CODPRO] <> <span class="code-string">"18402"</span>
+    )
+    - [Custo Reprocesso Quim]   <span class="code-comment">-- (-) Químicos gastos em reprocessos</span>
+    - [Custo Reprocesso Fix]    <span class="code-comment">-- (-) Mão de obra e máquina de reprocessos</span>
+
+<span class="code-comment">-- Por kg: lucro ou prejuízo gerado por cada quilo produzido</span>
+Resultado Un. = <span class="code-keyword">DIVIDE</span>([Resultado], [Fat. kg])</pre></div>
+        </div>
+      </div>
+
+      <!-- Rentabilidade -->
+      <div id="rentab" class="metric-card" style="border: 2px solid #2d5a3d;">
+        <div class="metric-header">
+          <span class="metric-col-badge" style="border-color:#2d5a3d;color:#2d5a3d;">Coluna T</span>
+          <span class="metric-name">Rent.(%) — Rentabilidade</span>
+          <span class="metric-formula-pill" style="background:#edf7f2;color:#1e7a4a;">Resultado ÷ Faturamento</span>
+        </div>
+        <div class="metric-body full">
+          <div>
+            <div class="metric-what-title">O indicador mais importante da tabela</div>
+            <div class="metric-what-text">
+              A rentabilidade é o <strong>termômetro final</strong> de cada cliente: de cada R$100 que ele nos paga, quantos reais sobraram como lucro depois de todos os custos. É o número que resume toda a análise em um único percentual comparável entre clientes de qualquer tamanho.
+            </div>
+          </div>
+          <div style="margin-top: 16px;">
+            <div class="metric-tip-title">Escala de referência</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px;">
+              <div class="scale-item" style="background:#fdf0f0;color:#b93030;">
+                <strong style="display:block;font-size:18px;font-family:'DM Mono',monospace;">< 0%</strong>
+                <span style="font-size:11px;">Prejuízo — requer ação imediata</span>
+              </div>
+              <div class="scale-item" style="background:#fdf6e8;color:#92600a;">
+                <strong style="display:block;font-size:18px;font-family:'DM Mono',monospace;">0–5%</strong>
+                <span style="font-size:11px;">Atenção — muito próximo do limite</span>
+              </div>
+              <div class="scale-item" style="background:#eff4fc;color:#1a4fa0;">
+                <strong style="display:block;font-size:18px;font-family:'DM Mono',monospace;">5–10%</strong>
+                <span style="font-size:11px;">Aceitável — mas pode melhorar</span>
+              </div>
+              <div class="scale-item" style="background:#edf7f2;color:#1e7a4a;">
+                <strong style="display:block;font-size:18px;font-family:'DM Mono',monospace;">> 10%</strong>
+                <span style="font-size:11px;">Saudável — cliente de qualidade</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="code-section" style="margin: 0 24px 24px;">
+          <div class="code-section-header"><span class="code-section-title">DAX — Rentabilidade %</span></div>
+          <div class="code-block"><pre><span class="code-comment">-- O percentual mais importante da tela.
+-- DIVIDE retorna BLANK() se não houver faturamento (sem erro na tela).</span>
+Rentab. (%) = 
+    <span class="code-keyword">DIVIDE</span>(
+        [Resultado],        <span class="code-comment">-- Lucro ou prejuízo do cliente</span>
+        [Vlr. Fat Rent]     <span class="code-comment">-- Sobre o faturamento bruto</span>
+        <span class="code-comment">-- Se faturamento = 0 → retorna BLANK() (célula vazia)</span>
+    )</pre></div>
+        </div>
+      </div>
+    </div><!-- /resultado -->
+
+
+    <!-- ════════════════════════════════
+         RESUMO — FLUXO DO DINHEIRO
+    ════════════════════════════════ -->
+    <div class="divider"></div>
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 32px; margin-top: 16px;">
+      <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:8px;color:var(--text-main);">Resumo — O caminho do dinheiro</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:28px;">Como cada coluna se conecta, da receita até o lucro final.</p>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div style="background:var(--blue-bg);border-radius:8px;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;font-weight:600;color:var(--blue);">＋ Faturamento Bruto (Vlr. Fat)</span>
+          <span style="font-size:11px;color:var(--text-muted);">Receita total do cliente</span>
+        </div>
+        <div style="text-align:center;font-size:18px;color:var(--text-light);padding:2px 0;">↓</div>
+        <div style="background:var(--amber-bg);border-radius:8px;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;font-weight:600;color:var(--amber);">− Custo Químico + Reprocessos</span>
+          <span style="font-size:11px;color:var(--text-muted);">Insumos diretos de produção</span>
+        </div>
+        <div style="background:var(--amber-bg);border-radius:8px;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;opacity:0.8;">
+          <span style="font-size:13px;font-weight:600;color:var(--amber);">− Frete + Comissão + Impostos + Financeiro</span>
+          <span style="font-size:11px;color:var(--text-muted);">Deduções variáveis</span>
+        </div>
+        <div style="text-align:center;font-size:12px;font-weight:600;color:var(--green);padding:6px 0;letter-spacing:.08em;text-transform:uppercase;">= Margem de Contribuição</div>
+        <div style="background:var(--red-bg);border-radius:8px;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;font-weight:600;color:var(--red);">− Custo Fixo (Rateio)</span>
+          <span style="font-size:11px;color:var(--text-muted);">Aluguel, energia, MO fixa, depreciação</span>
+        </div>
+        <div style="text-align:center;font-size:12px;font-weight:600;color:#5b3fa8;padding:6px 0;letter-spacing:.08em;text-transform:uppercase;">= Resultado Final → Rentabilidade (%)</div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<footer class="footer">
+  <div class="footer-brand">Análise Rentabilidade · BI Docs</div>
+  <div class="footer-note">Uso interno · Time de Produção & Negócios</div>
+</footer>
+
+</body>
+</html>
